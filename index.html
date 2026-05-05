@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FMS — Franchise Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:        #1a2b47;
+    --navy-dark:   #112036;
+    --navy-mid:    #213352;
+    --navy-light:  #2a4068;
+    --orange:      #e8632b;
+    --beige:       #f0ebe1;
+    --beige-dark:  #e5dfd4;
+    --white:       #ffffff;
+    --text-dark:   #1a2b47;
+    --text-mid:    #3a4f6a;
+    --text-light:  #6b7f99;
+    --border:      #ddd5c8;
+    --border-dark: #c5bdb0;
+    --red:         #dc3545;
+    --blue:        #2563eb;
+    --yellow:      #d97706;
+  }
+  body { font-family: 'Inter', sans-serif; background: var(--beige); color: var(--text-dark); min-height: 100vh; font-size: 12px; }
+
+  /* TOPBAR */
+  .topbar {
+    background: var(--navy-dark);
+    height: 46px; display: flex; align-items: center; padding: 0 14px; gap: 10px;
+  }
+  .logo-badge { background: var(--orange); color:#fff; font-size:11px; font-weight:800; padding:3px 7px; border-radius:4px; letter-spacing:.3px; }
+  .logo-sep { color:rgba(255,255,255,.5); font-size:20px; font-weight:200; margin: 0 2px; }
+  .logo-name { color:#fff; font-size:17px; font-weight:700; letter-spacing:.5px; }
+  .logo-sub { color:rgba(255,255,255,.4); font-size:10px; margin-left:4px; }
+  .search-box { flex:1; max-width:480px; margin-left:10px; }
+  .search-box input { width:100%; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.12); border-radius:4px; padding:6px 12px; font-size:11px; color:rgba(255,255,255,.65); font-family:inherit; outline:none; }
+  .search-box input::placeholder { color:rgba(255,255,255,.35); }
+  .tb-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+  .bell { width:28px;height:28px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.12); border-radius:50%; display:flex;align-items:center;justify-content:center; color:rgba(255,255,255,.6); font-size:12px; cursor:pointer; }
+  .av { width:28px;height:28px; background:var(--orange); border-radius:50%; display:flex;align-items:center;justify-content:center; font-size:10px;font-weight:700;color:#fff; cursor:pointer; }
+
+  /* LAYOUT */
+  .layout { display:flex; min-height:calc(100vh - 46px); }
+  .sidebar { width:40px; background:var(--navy-dark); display:flex;flex-direction:column;align-items:center; padding:10px 0; gap:4px; border-right:1px solid rgba(255,255,255,.05); flex-shrink:0; }
+  .ni { width:30px;height:30px; display:flex;align-items:center;justify-content:center; border-radius:5px; cursor:pointer; color:rgba(255,255,255,.3); font-size:13px; transition:background .12s,color .12s; }
+  .ni.act,.ni:hover { background:var(--orange); color:#fff; }
+  .ni.bot { margin-top:auto; }
+
+  /* CONTENT */
+  .main { flex:1; display:flex; min-width:0; }
+  .content { flex:1; padding:14px; overflow-y:auto; }
+  .page-label { font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);margin-bottom:10px; }
+
+  /* TOP CARDS */
+  .top-area {
+    background: var(--beige);
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:12px;
+    margin-bottom:12px;
+    display:grid;
+    grid-template-columns:230px 1fr 170px;
+    gap:10px;
+  }
+  .card { background:var(--white); border:1px solid var(--border); border-radius:5px; overflow:hidden; }
+  .card-h {
+    background:var(--navy); color:#fff;
+    font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+    padding:7px 11px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .live-badge { background:var(--orange); color:#fff; font-size:7px;font-weight:800;letter-spacing:.8px;padding:2px 5px;border-radius:20px;animation:blink 2s infinite; }
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.55}}
+  .card-body { padding:10px 12px; }
+
+  /* LEADS */
+  .leads-num { font-size:44px;font-weight:800;color:var(--orange);line-height:1; }
+  .leads-sub { font-size:10px;color:var(--text-light);margin-bottom:9px; }
+  .hs-btn {
+    display:inline-flex;align-items:center;gap:4px;
+    background:var(--orange);color:#fff;text-decoration:none;
+    border-radius:4px;padding:6px 10px;font-size:10px;font-weight:700;font-family:inherit;
+    margin-bottom:10px;transition:opacity .13s;
+  }
+  .hs-btn:hover { opacity:.85; }
+  .leads-grid { display:grid;grid-template-columns:1fr 1fr;gap:6px 4px; }
+  .lg-num { font-size:20px;font-weight:700;color:var(--text-dark); }
+  .lg-num.z { color:var(--text-light); }
+  .lg-lbl { font-size:9px;color:var(--text-light); }
+
+  /* EVENTS */
+  .ev-top { display:flex;gap:18px;margin-bottom:8px; }
+  .ev-big-v { font-size:36px;font-weight:800;color:var(--navy);line-height:1; }
+  .ev-big-l { font-size:9px;color:var(--text-light); }
+  .ev-alert { background:#fff2ec;border:1px solid #f5c0a0;border-radius:4px;padding:7px 9px;margin-bottom:8px; }
+  .ev-alert-n { font-size:20px;font-weight:800;color:var(--red);line-height:1; }
+  .ev-alert-l { font-size:9px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.4px; }
+  .ev-row { font-size:10px;color:var(--text-mid);padding:3px 0;border-bottom:1px solid #f0ebe1;display:flex;gap:4px;flex-wrap:wrap; }
+  .ev-row:last-child { border:none; }
+  .ev-t { color:var(--text-light); }
+  .ev-n { font-weight:700;color:var(--navy); }
+  .ev-k { color:var(--orange);font-weight:500; }
+  .ev-m { color:var(--text-light); }
+
+  /* TASKS */
+  .tasks-wrap { padding:10px 12px;display:flex;flex-direction:column;gap:6px; }
+  .task-box { background:var(--beige);border:1px solid var(--border);border-radius:4px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center; }
+  .task-v { font-size:24px;font-weight:800;color:var(--text-light);line-height:1; }
+  .task-l { font-size:9px;color:var(--text-light); }
+
+  /* BOTTOM */
+  .bot-wrap { border:1px solid var(--border);border-radius:7px;overflow:hidden;background:var(--white); }
+  .bot-hdr { background:var(--navy);color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 14px; }
+  .bot-cols { display:grid;grid-template-columns:1fr 1fr 1fr; }
+  .bcol { border-right:1px solid var(--border); overflow:hidden; }
+  .bcol:last-child { border-right:none; }
+  .bcol-h {
+    background:var(--navy-mid);color:#fff;
+    font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
+    padding:7px 11px;
+    display:flex;align-items:center;justify-content:space-between;gap:6px;
+  }
+  .bc-pills { display:flex;gap:4px;align-items:center; }
+  .pill { font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px;cursor:pointer; }
+  .pill-on { background:var(--orange);color:#fff; }
+  .pill-off { background:rgba(255,255,255,.15);color:rgba(255,255,255,.65); }
+  .va { font-size:8px;color:rgba(255,255,255,.55);cursor:pointer;text-decoration:none; }
+  .va:hover { color:#fff;text-decoration:underline; }
+
+  table.t { width:100%;border-collapse:collapse;font-size:10px; }
+  table.t thead th { background:var(--beige-dark);padding:5px 11px;font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-light);text-align:left;border-bottom:1px solid var(--border); }
+  table.t tbody td { padding:5px 11px;color:var(--text-mid);border-bottom:1px solid #f3ede4;vertical-align:middle; }
+  table.t tbody tr:last-child td { border-bottom:none; }
+  table.t tbody tr:hover { background:#faf7f2; }
+  .tb { font-weight:600;color:var(--text-dark); }
+  .tm { font-family:monospace;font-size:9px; }
+  .tg { color:#0a8a85;font-weight:600; }
+  .tr { color:var(--red);font-weight:600; }
+
+  .bcol-ft { background:var(--navy);color:#fff;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:8px 12px;display:flex;align-items:center;gap:6px;cursor:pointer;transition:background .12s; }
+  .bcol-ft:hover { background:var(--navy-light); }
+
+  /* ALERT PANEL */
+  .ap { width:290px;flex-shrink:0;background:var(--white);border-left:1px solid var(--border);display:flex;flex-direction:column; }
+  .ap-h { background:var(--navy);color:#fff;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:9px 13px;display:flex;align-items:center;justify-content:space-between; }
+  .ap-x { cursor:pointer;color:rgba(255,255,255,.45);font-size:15px; }
+  .ap-tabs { display:flex;gap:5px;padding:7px 9px;background:var(--beige);border-bottom:1px solid var(--border); }
+  .ap-tab { padding:4px 9px;font-size:9px;font-weight:700;border-radius:3px;cursor:pointer;color:var(--text-mid);background:var(--white);border:1px solid var(--border);transition:background .12s,color .12s; }
+  .ap-tab.on { background:var(--navy);color:#fff;border-color:var(--navy); }
+  .ap-list { flex:1;overflow-y:auto; }
+  .ap-row { display:flex;align-items:flex-start;gap:7px;padding:9px 12px;border-bottom:1px solid #f0ebe1;transition:background .1s; border-left:3px solid transparent; }
+  .ap-row.r-red   { background:#fef2f2;border-left-color:var(--red); }
+  .ap-row.r-blue  { background:#eff6ff;border-left-color:var(--blue); }
+  .ap-row.r-yel   { background:#fffbeb;border-left-color:var(--yellow); }
+  .ap-row.r-ora   { background:#fff7f3;border-left-color:var(--orange); }
+  .ap-dot { width:7px;height:7px;border-radius:50%;margin-top:4px;flex-shrink:0; }
+  .d-r{background:var(--red);} .d-b{background:var(--blue);} .d-y{background:var(--yellow);} .d-o{background:var(--orange);}
+  .ap-info { flex:1; }
+  .ap-ttl { font-size:11px;font-weight:600;color:var(--text-dark); }
+  .ap-dt  { font-size:9px;color:var(--text-light);margin-top:1px; }
+  .ap-btn { flex-shrink:0;background:var(--white);border:1px solid var(--border-dark);border-radius:3px;padding:3px 7px;font-size:8px;font-weight:700;color:var(--text-mid);cursor:pointer;font-family:inherit;white-space:nowrap;transition:border-color .12s,color .12s; }
+  .ap-btn:hover { border-color:var(--orange);color:var(--orange); }
+  .ap-ft { padding:11px 12px;border-top:1px solid var(--border);background:var(--beige); }
+  .open-hs { display:block;width:100%;background:var(--orange);color:#fff;text-decoration:none;text-align:center;border-radius:5px;padding:8px;font-size:10px;font-weight:700;letter-spacing:.3px;transition:opacity .13s; }
+  .open-hs:hover { opacity:.85; }
+
+  ::-webkit-scrollbar{width:3px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#ccc;border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:6px;">
+    <span class="logo-badge">FMS</span>
+    <span class="logo-sep">|</span>
+    <span class="logo-name">FMS</span>
+    <span class="logo-sub">Franchise Management System</span>
+  </div>
+  <div class="search-box">
+    <input type="text" placeholder="Search franchise name / id">
+  </div>
+  <div class="tb-right">
+    <div class="bell">🔔</div>
+    <div class="av">JS</div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <div class="sidebar">
+    <div class="ni act">⊞</div>
+    <div class="ni">👤</div>
+    <div class="ni">☰</div>
+    <div class="ni">📅</div>
+    <div class="ni">⚠</div>
+    <div class="ni">📊</div>
+    <div class="ni">🔧</div>
+    <div class="ni bot">⎋</div>
+  </div>
+
+  <div class="main">
+    <div class="content">
+      <div class="page-label">Dashboard</div>
+
+      <!-- TOP AREA -->
+      <div class="top-area">
+
+        <!-- LEADS -->
+        <div class="card">
+          <div class="card-h">
+            Leads Arriving (Last 7 Calendar Days)
+            <span class="live-badge">LIVE</span>
+          </div>
+          <div class="card-body">
+            <div class="leads-num">30</div>
+            <div class="leads-sub">New leads</div>
+            <a href="https://app.hubspot.com/contacts/51431793/objects/0-136/views/all/list?prefetch=" target="_blank" class="hs-btn">▸ Manage in HubSpot</a>
+            <div class="leads-grid">
+              <div><div class="lg-num">28</div><div class="lg-lbl">Updated</div></div>
+              <div><div class="lg-num z">0</div><div class="lg-lbl">Contacted</div></div>
+              <div><div class="lg-num z">0</div><div class="lg-lbl">Paused</div></div>
+              <div><div class="lg-num z">0</div><div class="lg-lbl">No-Shows</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EVENTS -->
+        <div class="card">
+          <div class="card-h">Events</div>
+          <div class="card-body">
+            <div class="ev-top">
+              <div><div class="ev-big-v">3</div><div class="ev-big-l">Today</div></div>
+              <div><div class="ev-big-v">15</div><div class="ev-big-l">In the next 2 days</div></div>
+            </div>
+            <div class="ev-alert">
+              <div class="ev-alert-n">1,226</div>
+              <div class="ev-alert-l">Past Due — needs attention</div>
+            </div>
+            <div class="ev-row"><span class="ev-t">10:00 AM ·</span><span class="ev-n">GARBA</span>,<span class="ev-k">Tour</span><span class="ev-m">#Fam-1 (2y, 4)</span></div>
+            <div class="ev-row"><span class="ev-t">10:00 AM ·</span><span class="ev-n">PATEL</span>,<span class="ev-k">Pre-enroll</span><span class="ev-m">#Fam-2 (1y, 6)</span></div>
+            <div class="ev-row"><span class="ev-t">10:00 AM ·</span><span class="ev-n">SORTINO</span>,<span class="ev-k">Tour</span><span class="ev-m">#Fam-3 (4y, 1)</span></div>
+          </div>
+        </div>
+
+        <!-- TASKS -->
+        <div class="card">
+          <div class="card-h">Tasks</div>
+          <div class="tasks-wrap">
+            <div class="task-box"><div><div class="task-v">0</div><div class="task-l">Past Due</div></div></div>
+            <div class="task-box"><div><div class="task-v">0</div><div class="task-l">Today</div></div></div>
+            <div class="task-box"><div><div class="task-v">0</div><div class="task-l">This Week</div></div></div>
+          </div>
+        </div>
+
+      </div><!-- /top-area -->
+
+      <!-- BOTTOM TABLES -->
+      <div class="bot-wrap">
+        <div class="bot-hdr">Upcoming Events (Current &amp; Next Week)</div>
+        <div class="bot-cols">
+
+          <!-- BIRTHDAYS -->
+          <div class="bcol">
+            <div class="bcol-h">
+              <span>🎂 Birthdays</span>
+              <div class="bc-pills">
+                <span class="pill pill-on">Current</span>
+                <span class="pill pill-off">Upcoming ▲</span>
+                <a href="#" class="va">view all</a>
+              </div>
+            </div>
+            <table class="t">
+              <thead><tr><th>Name</th><th>Date</th><th>Age</th><th>Loc.</th></tr></thead>
+              <tbody>
+                <tr><td class="tb">Roy, Ted</td><td class="tm">05/04/25</td><td>—</td><td>Sp-NH</td></tr>
+                <tr><td class="tb">Fay, Toni</td><td class="tm">5/15</td><td>2</td><td>Sp-NH</td></tr>
+                <tr><td class="tb">Munn, Hassan</td><td class="tm">5/15</td><td>3</td><td>Tam.Hts</td></tr>
+                <tr><td class="tb">Lafurres</td><td class="tm">5/15</td><td>2</td><td>Belaire Plz</td></tr>
+                <tr><td class="tb">Murphy, Piera</td><td class="tm">5/17</td><td>1</td><td>GlendrNW</td></tr>
+                <tr><td class="tb">Brawl, Edwark</td><td class="tm">5/18</td><td>3</td><td>Maple-49</td></tr>
+              </tbody>
+            </table>
+            <div class="bcol-ft">⇅ Upcoming Transitions</div>
+          </div>
+
+          <!-- ANNIVERSARIES -->
+          <div class="bcol">
+            <div class="bcol-h">
+              <span>🎖 Employee Anniversaries</span>
+              <a href="#" class="va">view all ▲</a>
+            </div>
+            <table class="t">
+              <thead><tr><th>Name</th><th>Hire Date</th><th>Tenure</th></tr></thead>
+              <tbody>
+                <tr><td class="tb">Papanastasi-Blane M.+1</td><td class="tm">11/15</td><td class="tg">1</td></tr>
+                <tr><td class="tb">TrendingBand</td><td class="tm">11/15</td><td class="tg">3</td></tr>
+                <tr><td class="tb">Student Employee</td><td class="tm">11/17</td><td class="tg">1</td></tr>
+                <tr><td class="tb">EmployeeOne</td><td class="tm">11/17</td><td class="tg">9</td></tr>
+                <tr><td class="tb">Euren-OTEI</td><td class="tm">11/17</td><td class="tg">0</td></tr>
+              </tbody>
+            </table>
+            <div class="bcol-ft">▶ Future Starts</div>
+          </div>
+
+          <!-- SEPARATIONS -->
+          <div class="bcol">
+            <div class="bcol-h">
+              <span>Employee Separations</span>
+              <a href="#" class="va">view all ▲</a>
+            </div>
+            <table class="t">
+              <thead><tr><th>Name</th><th>Last Day</th></tr></thead>
+              <tbody>
+                <tr><td class="tb">Olmos 128</td><td class="tr tm">1/25</td></tr>
+                <tr><td class="tb">Morgan Bennett</td><td class="tr tm">1/25</td></tr>
+                <tr><td class="tb">Lopez HC</td><td class="tr tm">1/26</td></tr>
+                <tr><td class="tb">SquarAdvise-N</td><td class="tr tm">1/27</td></tr>
+                <tr><td class="tb">JAR+AcomoNi+1</td><td class="tr tm">1/27</td></tr>
+              </tbody>
+            </table>
+            <div class="bcol-ft">✖ Future Deactivates</div>
+          </div>
+
+        </div>
+      </div><!-- /bot-wrap -->
+
+    </div><!-- /content -->
+
+    <!-- ALERT PANEL -->
+    <div class="ap">
+      <div class="ap-h">
+        Alert Center
+        <span class="ap-x">×</span>
+      </div>
+      <div class="ap-tabs">
+        <div class="ap-tab on" onclick="apTab(this)">Critical</div>
+        <div class="ap-tab" onclick="apTab(this)">Upcoming</div>
+        <div class="ap-tab" onclick="apTab(this)">Past Events</div>
+      </div>
+      <div class="ap-list">
+        <div class="ap-row r-red">
+          <div class="ap-dot d-r"></div>
+          <div class="ap-info"><div class="ap-ttl">Tour Missed</div><div class="ap-dt">03 May, 2025</div></div>
+          <button class="ap-btn">Mark Read</button>
+        </div>
+        <div class="ap-row r-red">
+          <div class="ap-dot d-r"></div>
+          <div class="ap-info"><div class="ap-ttl">Tour Missed</div><div class="ap-dt">18 days ago</div></div>
+          <button class="ap-btn">Mark Read</button>
+        </div>
+        <div class="ap-row r-blue">
+          <div class="ap-dot d-b"></div>
+          <div class="ap-info"><div class="ap-ttl">Admit 36871</div><div class="ap-dt">06 May, 2023</div></div>
+          <button class="ap-btn">Mark Tour</button>
+        </div>
+        <div class="ap-row r-yel">
+          <div class="ap-dot d-y"></div>
+          <div class="ap-info"><div class="ap-ttl">Admit 36475-2</div><div class="ap-dt">09 May, 2023</div></div>
+          <button class="ap-btn">Mark Tour</button>
+        </div>
+        <div class="ap-row r-ora">
+          <div class="ap-dot d-o"></div>
+          <div class="ap-info"><div class="ap-ttl">Follow-up Alert</div><div class="ap-dt">12 May, 2023</div></div>
+          <button class="ap-btn">Mark Read</button>
+        </div>
+        <div class="ap-row r-yel">
+          <div class="ap-dot d-y"></div>
+          <div class="ap-info"><div class="ap-ttl">Tour Pending</div><div class="ap-dt">14 May, 2023</div></div>
+          <button class="ap-btn">Mark Tour</button>
+        </div>
+      </div>
+      <div class="ap-ft">
+        <a href="https://app.hubspot.com/contacts/51431793/objects/0-136/views/all/list?prefetch=" target="_blank" class="open-hs">Open All Leads in HubSpot CRM →</a>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+  function apTab(el) {
+    document.querySelectorAll('.ap-tab').forEach(t => t.classList.remove('on'));
+    el.classList.add('on');
+  }
+</script>
+</body>
+</html>
